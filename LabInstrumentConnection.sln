@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabInstrumentConnection", "LabInstrumentConnection\LabInstrumentConnection.csproj", "{2F3C4E29-256D-4C0F-9339-E87632868EC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabMachiConnAdvia", "LabMachiConnAdvia\LabMachiConnAdvia.csproj", "{59B47BE2-20D9-4FD8-85F1-C9CE67C305B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabMachiLib", "LabMachiLib\LabMachiLib.csproj", "{7324F2EB-E2C0-4B57-ABC2-A0654418EAE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabMachiConnBeam", "LabMachiConnBeam\LabMachiConnBeam.csproj", "{A0455B36-BA03-4C5B-B3EB-5C5C134A27BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabMachiConnRobo", "LabMachiConnRobo\LabMachiConnRobo.csproj", "{30A7305D-1A74-4AF9-A7AC-DA3E2E35A0A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabMachiConnCobas", "LabMachiConnCobas\LabMachiConnCobas.csproj", "{6A0D776B-048F-4135-9770-0BAC2B0B4D65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialysisMachiConn", "DialysisMachiConn\DialysisMachiConn.csproj", "{AF951496-F3C3-49DF-A337-2E6808C478E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F3C4E29-256D-4C0F-9339-E87632868EC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F3C4E29-256D-4C0F-9339-E87632868EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F3C4E29-256D-4C0F-9339-E87632868EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F3C4E29-256D-4C0F-9339-E87632868EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59B47BE2-20D9-4FD8-85F1-C9CE67C305B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59B47BE2-20D9-4FD8-85F1-C9CE67C305B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59B47BE2-20D9-4FD8-85F1-C9CE67C305B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59B47BE2-20D9-4FD8-85F1-C9CE67C305B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7324F2EB-E2C0-4B57-ABC2-A0654418EAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7324F2EB-E2C0-4B57-ABC2-A0654418EAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7324F2EB-E2C0-4B57-ABC2-A0654418EAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7324F2EB-E2C0-4B57-ABC2-A0654418EAE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0455B36-BA03-4C5B-B3EB-5C5C134A27BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0455B36-BA03-4C5B-B3EB-5C5C134A27BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0455B36-BA03-4C5B-B3EB-5C5C134A27BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0455B36-BA03-4C5B-B3EB-5C5C134A27BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30A7305D-1A74-4AF9-A7AC-DA3E2E35A0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30A7305D-1A74-4AF9-A7AC-DA3E2E35A0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30A7305D-1A74-4AF9-A7AC-DA3E2E35A0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30A7305D-1A74-4AF9-A7AC-DA3E2E35A0A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0D776B-048F-4135-9770-0BAC2B0B4D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0D776B-048F-4135-9770-0BAC2B0B4D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0D776B-048F-4135-9770-0BAC2B0B4D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0D776B-048F-4135-9770-0BAC2B0B4D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF951496-F3C3-49DF-A337-2E6808C478E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF951496-F3C3-49DF-A337-2E6808C478E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF951496-F3C3-49DF-A337-2E6808C478E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF951496-F3C3-49DF-A337-2E6808C478E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
