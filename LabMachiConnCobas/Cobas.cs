@@ -210,7 +210,7 @@ namespace LabMachiConnCobas
                             if (detailData[0] == "R" && transmitTime != "" && orderID != "")
                             {
                                 //檢驗科主任要求，不簽收也要能上機
-                                ssql = "select * from TubeMapping where chTubeNo='" + orderID + "'";
+                                ssql = "select * from opd.TubeMapping where chTubeNo='" + orderID + "'";
                                 DataTable dt = SQL.Get_DataTable(ssql);
 
                                 //找到對應標籤號單子
@@ -230,7 +230,7 @@ namespace LabMachiConnCobas
                                     string chUnit = detailData[4];
 
                                     //***找到對應標籤號單子的報告數值資料,並判斷數值是否正常或異常***
-                                    ssql = "select * from labdrep where chlabemrno='" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "'";
+                                    ssql = "select * from opd.labdrep where chlabemrno='" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "'";
                                     DataTable dt0 = SQL.Get_DataTable(ssql);
                                     if (dt0.Rows.Count > 0)
                                     {
@@ -255,7 +255,7 @@ namespace LabMachiConnCobas
                                         //}
 
 
-                                        ssql = "update labdrep set chRepValue='" + chRepValue + "', chUnit='" + chUnit + "', chAbNormal='" + chAbNormal + "', chValueDttm='" + transmitTime + "' where chlabemrno = '" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "' and chRepValue = ''";
+                                        ssql = "update opd.labdrep set chRepValue='" + chRepValue + "', chUnit='" + chUnit + "', chAbNormal='" + chAbNormal + "', chValueDttm='" + transmitTime + "' where chlabemrno = '" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "' and chRepValue = ''";
                                         SQL.ExecuteSQL(ssql);
 
                                         oLabComm.FormMsgShow(currenrMsgText, string.Format(" 標籤號:{0} 處理完畢", orderID));
