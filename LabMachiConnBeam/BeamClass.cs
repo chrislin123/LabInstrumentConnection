@@ -30,7 +30,7 @@ namespace LabMachiConnBeam
         public string chRepValueStatus = "";
         //檢體類別代碼
         public string chSampleType = "";
-        //檢體類別
+        //資料類別
         public string chDataType = "";
         //單位
         public string chUnit = "";

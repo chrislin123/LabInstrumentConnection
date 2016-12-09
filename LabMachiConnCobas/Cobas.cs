@@ -218,6 +218,8 @@ namespace LabMachiConnCobas
                                 {
                                     //工作單號   
                                     string chlabemrno = dt.Rows[0]["chlabemrno"].ToString();
+                                    //工作單號   
+                                    string chintSeq = dt.Rows[0]["intSeq"].ToString();
                                     //儀器數值代碼的斷行符號
                                     string[] chMachineMappingBreak = new string[] { "^^^" };
                                     //儀器數值代碼
@@ -230,7 +232,10 @@ namespace LabMachiConnCobas
                                     string chUnit = detailData[4];
 
                                     //***找到對應標籤號單子的報告數值資料,並判斷數值是否正常或異常***
-                                    ssql = "select * from opd.labdrep where chlabemrno='" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "'";
+                                    ssql = "select * from opd.labdrep where chlabemrno='{0}' and chMachineMapping='{1}' and intSeq='{2}' ";
+                                    ssql = string.Format(ssql, chlabemrno, chMachineMapping, chintSeq);
+
+
                                     DataTable dt0 = SQL.Get_DataTable(ssql);
                                     if (dt0.Rows.Count > 0)
                                     {
@@ -255,7 +260,7 @@ namespace LabMachiConnCobas
                                         //}
 
 
-                                        ssql = "update opd.labdrep set chRepValue='" + chRepValue + "', chUnit='" + chUnit + "', chAbNormal='" + chAbNormal + "', chValueDttm='" + transmitTime + "' where chlabemrno = '" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "' and chRepValue = ''";
+                                        ssql = "update opd.labdrep set chRepValue='" + chRepValue + "', chUnit='" + chUnit + "', chAbNormal='" + chAbNormal + "', chValueDttm='" + transmitTime + "' where chlabemrno = '" + chlabemrno + "' and chMachineMapping='" + chMachineMapping + "' and intSeq='" + chintSeq + "' and chRepValue = '' ";
                                         SQL.ExecuteSQL(ssql);
 
                                         oLabComm.FormMsgShow(currenrMsgText, string.Format(" 標籤號:{0} 處理完畢", orderID));
