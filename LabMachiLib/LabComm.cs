@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
+using System.Net.Http;
+
 
 
 namespace LabMachiLib
@@ -255,6 +257,77 @@ namespace LabMachiLib
 
 
             return sResult;
+        }
+
+        const string sUrl = "http://192.168.83.253:4000/";
+        const string appcode = "middleware";
+        const string appkey = "563420cab70f4316b7dada8d1158eda8";
+
+        public async void aPostSaveResult(string jData)
+        {            
+            string sFuncName = "@lab/machine/saveResult";          
+
+            HttpClient client = new HttpClient();
+            
+            HttpContent content2 = new StringContent(jData, Encoding.UTF8, "application/json");
+            content2.Headers.Add("x-deva-appcode", appcode);
+            content2.Headers.Add("x-deva-appkey", appkey);
+            content2.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");            
+
+            HttpResponseMessage response = await client.PostAsync(sUrl + sFuncName, content2);
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+        }
+
+        public async void aPostTxResult(string jData)
+        {
+            string sFuncName = "@lab/machine/txresult";
+
+            HttpClient client = new HttpClient();
+
+            HttpContent content2 = new StringContent(jData, Encoding.UTF8, "application/json");
+            content2.Headers.Add("x-deva-appcode", appcode);
+            content2.Headers.Add("x-deva-appkey", appkey);
+            content2.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            HttpResponseMessage response = await client.PostAsync(sUrl + sFuncName, content2);
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+        }
+
+        public void PostSaveResult(string jData)
+        {
+            string sFuncName = "@lab/machine/saveResult";
+
+            HttpClient client = new HttpClient();
+
+            HttpContent content2 = new StringContent(jData, Encoding.UTF8, "application/json");
+            content2.Headers.Add("x-deva-appcode", appcode);
+            content2.Headers.Add("x-deva-appkey", appkey);
+            content2.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            
+            var response = client.PostAsync(sUrl + sFuncName, content2).Result;
+
+            string responseBody = response.Content.ReadAsStringAsync().Result;             
+        }
+
+        public void PostTxResult(string jData)
+        {
+            string sFuncName = "@lab/machine/txresult";
+
+            HttpClient client = new HttpClient();
+
+            HttpContent content2 = new StringContent(jData, Encoding.UTF8, "application/json");
+            content2.Headers.Add("x-deva-appcode", appcode);
+            content2.Headers.Add("x-deva-appkey", appkey);
+            content2.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            var response = client.PostAsync(sUrl + sFuncName, content2).Result;
+
+            string responseBody = response.Content.ReadAsStringAsync().Result; 
+
         }
 
 

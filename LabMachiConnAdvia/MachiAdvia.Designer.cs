@@ -56,6 +56,9 @@
             this.bwAdvia = new System.ComponentModel.BackgroundWorker();
             this.bwSend = new System.ComponentModel.BackgroundWorker();
             this.timerSend = new System.Windows.Forms.Timer(this.components);
+            this.btnStartNew = new System.Windows.Forms.Button();
+            this.timerAdviaNew = new System.Windows.Forms.Timer(this.components);
+            this.bwAdviaNew = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.pbConnStatus)).BeginInit();
             this.SuspendLayout();
             // 
@@ -296,11 +299,34 @@
             this.timerSend.Interval = 10000;
             this.timerSend.Tick += new System.EventHandler(this.timerSend_Tick);
             // 
+            // btnStartNew
+            // 
+            this.btnStartNew.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnStartNew.Location = new System.Drawing.Point(313, 95);
+            this.btnStartNew.Name = "btnStartNew";
+            this.btnStartNew.Size = new System.Drawing.Size(105, 35);
+            this.btnStartNew.TabIndex = 90;
+            this.btnStartNew.Text = "新系統轉檔";
+            this.btnStartNew.UseVisualStyleBackColor = true;
+            this.btnStartNew.Click += new System.EventHandler(this.btnStartNew_Click);
+            // 
+            // timerAdviaNew
+            // 
+            this.timerAdviaNew.Interval = 5000;
+            this.timerAdviaNew.Tick += new System.EventHandler(this.timerAdviaNew_Tick);
+            // 
+            // bwAdviaNew
+            // 
+            this.bwAdviaNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwAdviaNew_DoWork);
+            this.bwAdviaNew.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwAdviaNew_ProgressChanged);
+            this.bwAdviaNew.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwAdviaNew_RunWorkerCompleted);
+            // 
             // MachiAdvia
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(611, 530);
+            this.Controls.Add(this.btnStartNew);
             this.Controls.Add(this.lblConnPort);
             this.Controls.Add(this.lblConnHost);
             this.Controls.Add(this.label2);
@@ -360,6 +386,9 @@
         private System.ComponentModel.BackgroundWorker bwAdvia;
         private System.ComponentModel.BackgroundWorker bwSend;
         private System.Windows.Forms.Timer timerSend;
+        private System.Windows.Forms.Button btnStartNew;
+        private System.Windows.Forms.Timer timerAdviaNew;
+        private System.ComponentModel.BackgroundWorker bwAdviaNew;
     }
 }
 

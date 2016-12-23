@@ -10,6 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using LabMachiLib;
 using System.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace LabMachiConnCobas
 {
@@ -23,6 +26,7 @@ namespace LabMachiConnCobas
 
         // 宣告客戶端清單
         public static List<CobasClient> ClientList;
+        public static List<CobasClientNew> ClientListNew;
         int _port = 0;
         Socket _ListenSocket;
         bool closeSymbol = false;
@@ -76,6 +80,55 @@ namespace LabMachiConnCobas
 
 
         }
+
+        public void StartNew(System.Windows.Forms.RichTextBox msgText, System.Windows.Forms.RichTextBox errorText)
+        {
+            closeSymbol = false;
+
+            // 設定連線接聽阜值
+            int ServerPort = _port;
+
+            // 設定半開連接數
+            const int BackLog = 1800;
+
+            // 初始化客戶端清單
+            ClientListNew = new List<CobasClientNew>();
+
+            // 初始化客戶端序列號
+            int PlayerNum = 0;
+            // 建立接聽Socket
+            _ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            // 綁定接聽Socket的IP與Port
+            _ListenSocket.Bind(new IPEndPoint(IPAddress.Any, ServerPort));
+
+            // 開始接聽
+            _ListenSocket.Listen(BackLog);
+
+            // 輸出伺服器端起始訊息
+            //Console.WriteLine("開始接聽客戶端連線...");
+
+
+
+            // 持續等待客戶端接入
+            while (true)
+            {
+                if (closeSymbol == true) { break; }
+                try
+                {
+                    ClientListNew.Add(new CobasClientNew(PlayerNum, _ListenSocket.Accept(), msgText, errorText));
+                    PlayerNum++;
+                }
+                catch (Exception ex)
+                {
+                    break;
+                }
+            }
+
+
+        }
+
+
 
         public static void BoardCast(string serverResponse)
         {
@@ -294,6 +347,185 @@ namespace LabMachiConnCobas
                                 orderID = "";
                             }
                         }
+
+                        //===========================================================================================
+                        //ACK                        
+                        PlayerSocket.Send(Encoding.GetEncoding("Big5").GetBytes("\u0006"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                oLabComm.FormMsgShow(currentErrorText, string.Format(" 標籤號:{0} 處理失敗。訊息:{1}", orderID, ex.Message));
+
+                oLabComm.insertlog(sFirmType, ex.Message);
+            }
+            finally
+            {
+                transmitTime = "";
+                orderID = "";
+                PlayerSocket.Close();
+                this.CurrentStatus = 0;
+                Cobas.RemoveClient(this.CurrentPlayerNum);
+            }
+        }
+
+        public int SendToPlayer(string serverResponse)
+        {
+            if (this.CurrentStatus.Equals(1))
+            {
+                try
+                {
+                    byte[] sendBytes = Encoding.UTF8.GetBytes(serverResponse);
+                    return PlayerSocket.Send(sendBytes);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            else
+                return 0;
+        }
+    }
+
+    public class CobasClientNew
+    {
+        LabComm oLabComm = new LabComm(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+        EzMySQL SQL = new EzMySQL(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+        string ssql = string.Empty;
+        //廠商類別
+        string sFirmType = "Cobas";
+
+        public int CurrentPlayerNum { get; set; }
+        public Socket PlayerSocket { get; set; }
+        public int CurrentStatus { get; set; }
+        public System.Windows.Forms.RichTextBox currenrMsgText;
+        public System.Windows.Forms.RichTextBox currentErrorText;
+        public CobasClientNew(int PlayerNum, Socket mySocket, System.Windows.Forms.RichTextBox msgText, System.Windows.Forms.RichTextBox errorText)
+        {
+            this.CurrentPlayerNum = PlayerNum;
+            this.PlayerSocket = mySocket;
+            this.CurrentStatus = 1;
+            this.currenrMsgText = msgText;
+            this.currentErrorText = errorText;
+            DoCommunicate();
+        }
+
+        public void DoCommunicate()
+        {
+            //產生 BackgroundWorker 負責處理每一個 socket client 的 reuqest
+            BackgroundWorker bgwSocket = new BackgroundWorker();
+            bgwSocket.DoWork += new DoWorkEventHandler(bgwSocket_DoWork);
+            bgwSocket.RunWorkerAsync();
+        }
+
+        private void bgwSocket_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string orderID = "";//標籤號
+            string transmitTime = "";//傳送時間
+            try
+            {
+                while (PlayerSocket.Connected)
+                {
+                    byte[] readBuffer = new byte[PlayerSocket.ReceiveBufferSize];
+                    int count = 0;
+
+                    if ((count = PlayerSocket.Receive(readBuffer)) > 0)
+                    {
+                        string clientRequest = Encoding.UTF8.GetString(readBuffer, 0, count);
+                        //極重要 發報告轉檔=========================================================================
+                        //處理換行，"\r", "\rO", "\rR"
+                        string[] breakLine = new string[] { "\r", "\rO", "\rR" };
+                        string[] breakLineDataString = clientRequest.Split(breakLine, System.StringSplitOptions.None);
+
+
+                        //每行數值
+                        for (int i = 0; i < breakLineDataString.Length; i++)
+                        {
+                            oLabComm.insertlog(sFirmType, breakLineDataString[i]);
+                            //SQL.ExecuteSQL("insert into opd.labinstrumentlog (type,log,time) values('Cobas','" + breakLineDataString + "','" + DateTime.Now.ToLongDateString() + DateTime.Now.ToLongTimeString() + "')");
+
+                            string[] detailData = breakLineDataString[i].Split('|');
+
+                            //處理傳送時參數
+                            if (detailData[0] == "H")
+                            {
+                                //並不是檢驗結果回傳數值  ex:有可能是回傳校正值... 等等
+                                if (detailData[10] != "M")
+                                {
+                                    //將最重要的參數再次設預設值
+                                    orderID = "";//標籤號
+                                    transmitTime = "";//傳送時間
+
+                                    break;
+                                }
+                                transmitTime = detailData[13];
+                            }
+                            //處理病患參數 ==>暫時不處理
+                            if (detailData[0] == "P")
+                            {
+
+                            }
+
+                            //處理標籤號
+                            if (detailData[0] == "O")
+                            {
+                                orderID = detailData[3].Split('^')[0];
+                                oLabComm.FormMsgShow(currenrMsgText, string.Format(" 標籤號:{0} 處理中", orderID));
+
+                            }
+
+                            //處理回傳數值 並且最重要的2個參數不能為空值
+                            if (detailData[0] == "R" && transmitTime != "" && orderID != "")
+                            {
+
+                                //儀器數值代碼
+                                string[] chMachineMappingBreak = new string[] { "^^^" };
+                                string chMachineMapping = detailData[2].Split(chMachineMappingBreak, System.StringSplitOptions.None)[1];
+
+                                //數值
+                                string chRepValue = detailData[3];
+                                
+                                dynamic dymSaveData = new JObject();
+                                dymSaveData.Add("tubeNo", orderID);
+                                dymSaveData.Add("seqNo", "1"); //非對應預設帶1
+                                dymSaveData.Add("macPscCode", chMachineMapping);
+                                dymSaveData.Add("repValue", chRepValue);
+
+                                string jSaveData = JsonConvert.SerializeObject(dymSaveData);
+
+                                //回傳數值至HIS系統
+                                oLabComm.PostSaveResult(jSaveData);
+
+                                dynamic dymTransFinish = new JObject();
+                                dymTransFinish.Add("tubeNo", orderID);
+                                dymTransFinish.Add("seqNo", "1"); //非對應預設帶1
+                                dymTransFinish.Add("macPscCode", chMachineMapping);
+                                dymTransFinish.Add("txTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+                                string jTransFinish = JsonConvert.SerializeObject(dymTransFinish);
+
+                                //回傳完成訊息至HIS系統
+                                oLabComm.PostTxResult(jTransFinish);
+
+                                //數值非空值寫入記錄檔
+                                if (chRepValue != "")
+                                {
+                                    oLabComm.insertlog(sFirmType, string.Format("檢體號：{0},機器碼：{1},數值：{2}", orderID, chMachineMapping, chRepValue));
+                                }
+                            }
+
+                            //遇到結束縛號清掉
+                            if (detailData[0] == "L")
+                            {
+                                transmitTime = "";
+                                orderID = "";
+                            }
+                        }
+
+                        //回報畫面處理完畢
+                        oLabComm.FormMsgShow(currenrMsgText, string.Format(" 標籤號:{0} 處理完畢", orderID));
 
                         //===========================================================================================
                         //ACK                        

@@ -333,6 +333,92 @@ namespace LabMachiConnAdvia
             {
                 //timer1.Start();
             }
+        }
+
+        private void btnStartNew_Click(object sender, EventArgs e)
+        {
+            lblAdviaStatus.Text = "轉檔中";
+            lblAdviaStartTime.Text = DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString();
+
+            if (timerAdviaNew.Enabled == false)
+            {
+                timerAdviaNew.Enabled = true;
+            }
+        }
+
+        private void timerAdviaNew_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+
+
+                bwAdviaNew.WorkerSupportsCancellation = true;
+                if (bwAdviaNew.IsBusy == false)
+                {
+                    oLabComm.FormMsgShow(txtMsg, "開始接收");
+                    bwAdviaNew.WorkerReportsProgress = true;
+                    bwAdviaNew.RunWorkerAsync();
+
+                }
+            }
+            finally
+            {
+                //timer1.Start();
+            }
+        }
+
+        private void bwAdviaNew_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            ADIVACentaur oAdvia = new ADIVACentaur();
+
+            try
+            {
+                oAdvia.Start(bwAdvia);
+            }
+            catch (Exception ex)
+            {
+                oLabComm.FeedbackMsg(worker, msgtype.msgErr, ex.Message);
+            }           
+        }
+
+        private void bwAdviaNew_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //一般訊息
+            if (e.ProgressPercentage == (int)msgtype.msgGeneral)
+            {
+                if (e.UserState != null)
+                {
+                    oLabComm.FormMsgShow(txtMsg, e.UserState.ToString());
+                }
+            }
+
+            //錯誤訊息
+            if (e.ProgressPercentage == (int)msgtype.msgErr)
+            {
+                if (e.UserState != null)
+                {
+                    oLabComm.FormMsgShow(txtErrorMsg, e.UserState.ToString());
+                }
+            }
+
+            //狀態
+            if (e.ProgressPercentage == (int)msgtype.msgStatus)
+            {
+                if (e.UserState != null)
+                {
+                    lblAdviaStatus.Text = e.UserState.ToString();
+                }
+            }
+
+            //顯示行數
+            oLabComm.LimitLines(txtMsg, 50);
+        }
+
+        private void bwAdviaNew_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //oLabComm.FormMsgShow(txtMsg, "轉檔完畢。");
         }      
     }
 }

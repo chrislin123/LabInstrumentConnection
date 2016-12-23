@@ -47,6 +47,10 @@
             this.label50 = new System.Windows.Forms.Label();
             this.btnStart = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
+            this.btnStartNew = new System.Windows.Forms.Button();
+            this.bwCobasNew = new System.ComponentModel.BackgroundWorker();
+            this.lblMode = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblConnPort
@@ -237,11 +241,49 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
+            // btnStartNew
+            // 
+            this.btnStartNew.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnStartNew.Location = new System.Drawing.Point(293, 101);
+            this.btnStartNew.Name = "btnStartNew";
+            this.btnStartNew.Size = new System.Drawing.Size(122, 35);
+            this.btnStartNew.TabIndex = 120;
+            this.btnStartNew.Text = "新系統轉檔";
+            this.btnStartNew.UseVisualStyleBackColor = true;
+            this.btnStartNew.Click += new System.EventHandler(this.btnStartNew_Click);
+            // 
+            // bwCobasNew
+            // 
+            this.bwCobasNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwCobasNew_DoWork);
+            // 
+            // lblMode
+            // 
+            this.lblMode.AutoSize = true;
+            this.lblMode.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lblMode.Location = new System.Drawing.Point(433, 60);
+            this.lblMode.Name = "lblMode";
+            this.lblMode.Size = new System.Drawing.Size(23, 16);
+            this.lblMode.TabIndex = 122;
+            this.lblMode.Text = "---";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label3.Location = new System.Drawing.Point(383, 60);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(44, 16);
+            this.label3.TabIndex = 121;
+            this.label3.Text = "模式:";
+            // 
             // MachiCobas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(611, 513);
+            this.Controls.Add(this.lblMode);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.btnStartNew);
             this.Controls.Add(this.lblConnPort);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lblConnHost);
@@ -289,6 +331,10 @@
         private System.Windows.Forms.Label label50;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Button btnStartNew;
+        private System.ComponentModel.BackgroundWorker bwCobasNew;
+        private System.Windows.Forms.Label lblMode;
+        private System.Windows.Forms.Label label3;
     }
 }
 

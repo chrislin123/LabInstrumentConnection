@@ -11,6 +11,8 @@ using System.Threading;
 using LabMachiLib;
 using System.Configuration;
 using System.ComponentModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LabMachiConnAdvia
 {
@@ -37,7 +39,7 @@ namespace LabMachiConnAdvia
         string ssql = string.Empty;
         EzMySQL SQL = new EzMySQL(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);        
         LabComm oLabComm = new LabComm(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
-
+        Dictionary<string, string> dicList = new Dictionary<string, string>();
 
         /// <summary>
         /// AVDIA為Socket Client 設計因此在New時不須指定PORT,而是看資料庫設定，PORT資料存在DB中
@@ -46,6 +48,8 @@ namespace LabMachiConnAdvia
         public ADIVACentaur(int port = 0)
         {
             //_port = port;
+
+            dicList = CreateLabSet();
         }
         public void Start(BackgroundWorker bw)
         {
@@ -112,6 +116,74 @@ namespace LabMachiConnAdvia
             {
                 //關閉Socket                
                 oLabComm.CloseSocket(_mySocket);            
+            }
+        }
+
+        public void StartNew(BackgroundWorker bw)
+        {
+            closeSymbol = false;
+
+            //Centaur IP
+            string host = SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurIP'");
+            //host = "123.123.123.123";            
+
+            //AVDIA ORDER Port
+            int port = int.Parse(SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurPort'"));
+            //int port = 8081;         
+
+            //SOH[01]=Beginning of Header
+            //STX[02]=Beginning of Text Sending
+            //ETX[03]=End of Text Sending
+            //EOT[04]=End of Sending
+            //ENQ[05]=Inquiry
+            //ACK[06]=Positive Response
+            //CR[]=
+            //NAK[15]=Negative Response
+
+            //byte[] STX = Encoding.GetEncoding("Big5").GetBytes("\u0002");            
+            //byte[] ETX = Encoding.GetEncoding("Big5").GetBytes("\u0003");            
+            //byte[] EOT = Encoding.GetEncoding("Big5").GetBytes("\u0004");            
+            //byte[] ENQ = Encoding.GetEncoding("Big5").GetBytes("\u0005");            
+            //byte[] CR = Encoding.GetEncoding("Big5").GetBytes("\r");            
+            //byte[] ACK = Encoding.GetEncoding("Big5").GetBytes("\u0006");            
+            //byte[] NAK = Encoding.GetEncoding("Big5").GetBytes("\u0015");
+
+
+            IPAddress[] IPs = Dns.GetHostAddresses(host);
+            _mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                //未連線則進行連線
+                if (_mySocket.Connected == false) _mySocket.Connect(IPs[0], port);
+
+                //連線失敗則跳出
+                if (_mySocket.Connected == false)
+                {
+                    oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, string.Format("Socket:{0} {1} 連線失敗。", host, port));
+                    return;
+                }
+
+                ////前人經驗，先送個ACK
+                _mySocket.Send(Encoding.GetEncoding("Big5").GetBytes("\u0006"));
+
+                //取得完整免疫資料                
+                AdivaData oAdivaData = ReceiveProc(bw);
+
+                //儀器資料轉至HIS系統                
+                MachineDataToHisNew(oAdivaData, bw);
+
+            }
+            catch (Exception ex)
+            {
+                oLabComm.FeedbackMsg(bw, msgtype.msgErr, ex.Message);
+
+                //寫入異常紀錄
+                oLabComm.insertlog(LabType, "Error==" + ex.Message);
+            }
+            finally
+            {
+                //關閉Socket                
+                oLabComm.CloseSocket(_mySocket);
             }
         }
 
@@ -737,6 +809,234 @@ namespace LabMachiConnAdvia
 
         }
 
+        /// <summary>儀器資料轉至HIS系統
+        /// 
+        /// </summary>
+        private void MachineDataToHisNew(AdivaData oAdivaData, BackgroundWorker bw)
+        {
+            if (oAdivaData.SampleID != "")
+            {
+                oLabComm.FeedbackMsg(bw, msgtype.msgStatus, "寫入HIS系統中..");
+
+                oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, string.Format("寫入HIS系統中..檢體號:{0}", oAdivaData.SampleID));
+
+                LabMachineData oMachData = new LabMachineData();
+                string TransmitTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                //bool bIsINTR = false;
+
+
+                foreach (string sLisCode in oAdivaData.OrderList)
+                {
+                    //寫入His系統的數值
+                    string sValue = string.Empty;
+                    //目前儀器傳出來的項目數值
+                    string sValue_INTR = string.Empty;
+                    string sValue_INDX = string.Empty;
+                    string sValue_DOSE = string.Empty;
+                    string sValue_COFF = string.Empty;
+                    string sValue_RLU = string.Empty;
+
+
+                    /* 
+                    //取得管子資料
+                    ssql = " select * from opd.tubemapping a "
+                         + " left join opd.labdrep b on a.chLabEmrNo = b.chlabemrno and a.intSeq = b.intSeq "
+                         + " where chtubeno = '" + oAdivaData.SampleID + "' "
+                         + " and chMachineMapping = '" + sLisCode + "' ";
+
+                    DataTable dt = SQL.Get_DataTable(ssql);
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        oMachData.chLabEmrNo = dr["chLabEmrNo"].ToString();
+                        oMachData.chTubeNo = dr["chTubeNo"].ToString();
+                        oMachData.intSeq = dr["intSeq"].ToString();
+                        oMachData.chMachineNo = dr["chMachineNo"].ToString();
+                        oMachData.chTransmitTime = TransmitTime;
+                        oMachData.chMachineMapping = sLisCode;
+                    }
+
+                    //寫入記錄檔
+                    foreach (AdivaRecordData item in oAdivaData.RecordList)
+                    {
+                        if (item.LIScode != sLisCode) continue;
+
+                        //判斷是否INTR
+                        if (item.ResultAspects == "INTR")
+                        {
+                            sValue_INTR = item.DataValue == "React" ? "Reactive" : "Non-reactive";
+                        }
+
+
+                        if (item.ResultAspects == "INDX") sValue_INDX = item.DataValue;
+                        if (item.ResultAspects == "DOSE") sValue_DOSE = item.DataValue;
+                        if (item.ResultAspects == "COFF") sValue_COFF = item.DataValue;
+                        if (item.ResultAspects == "RLU") sValue_RLU = item.DataValue;
+
+                        oMachData.chValue = "";
+                        oMachData.chValuetype = "";
+                        oMachData.chUnit = "";
+                        oMachData.chOnBoardTime = "";
+
+                        oMachData.chValue = item.DataValue;
+                        oMachData.chValuetype = item.ResultAspects;
+                        oMachData.chUnit = item.DataUnits;
+
+                        ssql = " insert into opd.labmachinedata "
+                             + " (chLabEmrNo,intSeq,chTubeNo,chCombineCode "
+                             + " ,chMachineNo,chMachineMapping,chValuetype,chValue "
+                             + " ,chUnit,chTransmitTime,chOnBoardTime,chUpdToHisTime) "
+                             + " values ( "
+                             + " '" + oMachData.chLabEmrNo + "' "
+                             + " ,'" + oMachData.intSeq + "' "
+                            //+ " ,'" + oMachData.chTubeNo + "' "
+                             + " ,'" + oAdivaData.SampleID + "' "  //選擇儀器sampleno(管號或試管號)                                 
+                             + " ,'" + oMachData.chCombineCode + "' "
+                             + " ,'" + oMachData.chMachineNo + "' "
+                             + " ,'" + oMachData.chMachineMapping + "' "
+                             + " ,'" + oMachData.chValuetype + "' "
+                             + " ,'" + oMachData.chValue + "' "
+                             + " ,'" + oMachData.chUnit + "' "
+                             + " ,'" + oMachData.chTransmitTime + "' "
+                             + " ,'" + oMachData.chOnBoardTime + "' "
+                             + " ,'' "
+                             + " ) "
+                             ;
+                        SQL.ExecuteSQL(ssql);
+                    }
+                    */
+                    //調整非線性數值資料
+
+
+                    //取得數值組合設定檔                    
+                    //ssql = " select usKey from msutilset "
+                    //     + " where usType = 'LabA' "
+                    //     + " and usValue='" + oMachData.chMachineMapping + "' "
+                    //     ;
+                    //string ValueType = SQL.Get_Scalar(ssql);
+
+                    //1051221 配合新系統改寫，設定檔寫死在程式碼中
+                    string ValueType = dicList[oMachData.chMachineMapping].ToString();
+
+
+                    if (ValueType == "Tp1") //DOSE
+                    {
+                        //非線性資料規則
+                        sValue_DOSE = NonLineValueRule(oMachData.chMachineMapping, sValue_DOSE);
+                        sValue = sValue_DOSE;
+                    }
+                    else if (ValueType == "Tp2") //INTR(DOSE)
+                    {
+                        //非線性資料規則
+                        sValue_DOSE = NonLineValueRule(oMachData.chMachineMapping, sValue_DOSE);
+                        sValue = string.Format("{0}({1})", sValue_INTR, sValue_DOSE);
+                    }
+                    else if (ValueType == "Tp3") //INTR(INDX)
+                    {
+                        //非線性資料規則
+                        sValue_INDX = NonLineValueRule(oMachData.chMachineMapping, sValue_INDX);
+                        sValue = string.Format("{0}({1})", sValue_INTR, sValue_INDX);
+                    }
+                    else if (ValueType == "Tp4") //INTR(COFF)
+                    {
+                        //非線性資料規則
+                        sValue_COFF = NonLineValueRule(oMachData.chMachineMapping, sValue_COFF);
+                        sValue = string.Format("{0}({1})", sValue_INTR, sValue_COFF);
+                    }
+                    else //數值預設空白
+                    {
+                        sValue = "";
+                        //sValue = sValue_DOSE;
+                    }
+
+
+                    //1051221 
+
+                    //檢體號
+                    string chTubeNo = oAdivaData.SampleID;
+
+                    //儀器數值代碼                    
+                    string chMachineMapping = oMachData.chMachineMapping;
+
+                    //數值
+                    string chRepValue = sValue;
+
+                    dynamic dymSaveData = new JObject();
+                    dymSaveData.Add("tubeNo", chTubeNo);
+                    dymSaveData.Add("seqNo", "1"); //非對應預設帶1
+                    dymSaveData.Add("macPscCode", chMachineMapping);
+                    dymSaveData.Add("repValue", chRepValue);
+
+                    string jSaveData = JsonConvert.SerializeObject(dymSaveData);
+
+                    //回傳數值至HIS系統
+                    oLabComm.PostSaveResult(jSaveData);
+
+                    dynamic dymTransFinish = new JObject();
+                    dymTransFinish.Add("tubeNo", chTubeNo);
+                    dymTransFinish.Add("seqNo", "1"); //非對應預設帶1
+                    dymTransFinish.Add("macPscCode", chMachineMapping);
+                    dymTransFinish.Add("txTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+                    string jTransFinish = JsonConvert.SerializeObject(dymTransFinish);
+
+                    //回傳完成訊息至HIS系統
+                    oLabComm.PostTxResult(jTransFinish);
+
+
+                    string sTemp = string.Format("開單號:{0},序號:{1},儀器碼:{2},數值:{3}"
+                        , oMachData.chLabEmrNo
+                        , oMachData.intSeq
+                        , oMachData.chMachineMapping
+                        , sValue
+                        );
+                    oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, sTemp);
+
+                    //ssql = " select * from opd.labdrep "
+                    //     + " where chlabemrno = '" + oMachData.chLabEmrNo + "' "
+                    //     + " and chMachineMapping='" + oMachData.chMachineMapping + "' "
+                    //     + " and intSeq='" + oMachData.intSeq + "' "
+                    //     + " and chRepValue = '' "
+                    //     ;
+                    //dt.Clear();
+                    //dt = SQL.Get_DataTable(ssql);
+                    //if (dt.Rows.Count > 0)
+                    //{
+                    //    //更新報告報告項目
+                    //    string updatetime = DateTime.Now.ToString("yyyyMMddHHmm");
+
+                    //    ssql = " update opd.labdrep set "
+                    //         + " chRepValue='" + sValue + "', chValueDttm='" + updatetime + "' "
+                    //         + " where chlabemrno = '" + oMachData.chLabEmrNo + "' and chMachineMapping='" + oMachData.chMachineMapping + "' "
+                    //         + " and chRepValue = '' and intSeq = '" + oMachData.intSeq + "' ";
+                    //    SQL.ExecuteSQL(ssql);
+
+                    //    //更新後記錄於Tubemapping
+                    //    ssql = " update opd.labmachinedata set "
+                    //         + " chUpdToHisTime='" + TransmitTime + "' "
+                    //         + " where chLabEmrNo = '" + oMachData.chLabEmrNo + "' "
+                    //         + " and intseq = '" + oMachData.intSeq + "' "
+                    //         + " and chtubeno = '" + oMachData.chTubeNo + "' "
+                    //         + " and chMachineMapping='" + oMachData.chMachineMapping + "' "
+                    //         ;
+                    //    SQL.ExecuteSQL(ssql);
+
+                    //    string sTemp = string.Format("開單號:{0},序號:{1},儀器碼:{2},數值:{3}"
+                    //        , oMachData.chLabEmrNo
+                    //        , oMachData.intSeq
+                    //        , oMachData.chMachineMapping
+                    //        , sValue
+                    //        );
+                    //    oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, sTemp);
+
+                    //}
+
+                }
+
+
+            }
+
+        }
+
         /// <summary>非線性資料規則
         /// 
         /// </summary>        
@@ -1266,7 +1566,41 @@ namespace LabMachiConnAdvia
             return "";
         }
 
+        private Dictionary<string, string> CreateLabSet()
+        {
+            Dictionary<string, string> dicList = new Dictionary<string, string>();
 
+            dicList.Add("TSH3UL", "Tp1");
+            dicList.Add("PSA", "Tp1");
+            dicList.Add("FT4", "Tp1");
+            dicList.Add("aTPO", "Tp1");
+            dicList.Add("TnIUltra", "Tp1");
+            dicList.Add("AFP", "Tp1");
+            dicList.Add("T3", "Tp1");
+            dicList.Add("BNP", "Tp1");
+            dicList.Add("T4", "Tp1");
+            dicList.Add("FER", "Tp1");
+            dicList.Add("IgE", "Tp1");
+            dicList.Add("HCY", "Tp1");
+            dicList.Add("PCT", "Tp1");
+            dicList.Add("CEA", "Tp1");
+            dicList.Add("CA125", "Tp1");
+            dicList.Add("CA199", "Tp1");
+            dicList.Add("CA153", "Tp1");
+            dicList.Add("iPTH", "Tp1");
+            dicList.Add("THCG", "Tp1");
+            dicList.Add("COR", "Tp1");
+            dicList.Add("PCT", "Tp1");
+
+            dicList.Add("aHBs2", "Tp2");
+            dicList.Add("RubG", "Tp2");
+            dicList.Add("aHAVT", "Tp2");
+            dicList.Add("aHAVM", "Tp2");
+            dicList.Add("HBs", "Tp3");
+            dicList.Add("aHCV", "Tp3");
+
+            return dicList;
+        }        
 
         
     }

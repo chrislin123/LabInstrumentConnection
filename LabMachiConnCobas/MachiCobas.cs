@@ -7,6 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LabMachiLib;
+using System.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 
 namespace LabMachiConnCobas
 {
@@ -48,6 +53,48 @@ namespace LabMachiConnCobas
         {
             oCobas.Close();
             this.Close();         
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnStartNew_Click(object sender, EventArgs e)
+        {
+            //LabComm oLabComm = new LabComm(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+
+
+            //dynamic dymTransFinish = new JObject();
+            //dymTransFinish.Add("tubeNo", "201612190007");
+            //dymTransFinish.Add("seqNo", "1"); //非對應預設帶1
+            //dymTransFinish.Add("macPscCode", "MCH");
+            //dymTransFinish.Add("txTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+            //string jTransFinish = JsonConvert.SerializeObject(dymTransFinish);
+
+            ////回傳完成訊息至HIS系統
+            //oLabComm.PostTxResult(jTransFinish);
+
+            
+
+            //return;
+
+
+            //cobas start
+            if (!bwCobas.IsBusy)
+            {
+                lblMode.Text = "新系統轉檔";
+                lblStatus.Text = "轉檔中";
+                lblStartTime.Text = DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString();
+                
+                bwCobasNew.RunWorkerAsync();
+            }
+        }
+
+        private void bwCobasNew_DoWork(object sender, DoWorkEventArgs e)
+        {
+            oCobas.StartNew(txtMsg, txtErrorMsg);
         }
 
 
