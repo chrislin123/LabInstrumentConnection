@@ -375,7 +375,7 @@ namespace LabMachiConnAdvia
 
             try
             {
-                oAdvia.Start(bwAdvia);
+                oAdvia.StartNew(bwAdvia);
             }
             catch (Exception ex)
             {

@@ -330,6 +330,22 @@ namespace LabMachiLib
 
         }
 
+        public string GetListTodo()
+        {
+            string sResult = "";
+            string sFuncName = "@lab/machine/listTodo";
+
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("x-deva-appcode", appcode);
+            client.DefaultRequestHeaders.Add("x-deva-appkey", appkey);
+
+            var response = client.GetAsync(sUrl + sFuncName).Result;
+
+            sResult = response.Content.ReadAsStringAsync().Result; 
+            return sResult;
+
+        }
+
 
     }
 }

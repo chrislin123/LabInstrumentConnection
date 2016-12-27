@@ -30,7 +30,7 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnSendNew = new System.Windows.Forms.Button();
             this.label23 = new System.Windows.Forms.Label();
             this.HCLABSendErrorMsg = new System.Windows.Forms.RichTextBox();
             this.HCLABSendMsg = new System.Windows.Forms.RichTextBox();
@@ -43,8 +43,10 @@
             this.hclabSendLastStartTime = new System.Windows.Forms.Label();
             this.hclabSendStatus = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
-            this.button10 = new System.Windows.Forms.Button();
-            this.button11 = new System.Windows.Forms.Button();
+            this.btnSendClose = new System.Windows.Forms.Button();
+            this.btnSend = new System.Windows.Forms.Button();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnRecNew = new System.Windows.Forms.Button();
             this.HCLABReceiveErrorMsg = new System.Windows.Forms.RichTextBox();
             this.HCLABReceiveMsg = new System.Windows.Forms.RichTextBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -57,8 +59,14 @@
             this.hclabReceiveLastStartTime = new System.Windows.Forms.Label();
             this.hclabReceiveStatus = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
-            this.button12 = new System.Windows.Forms.Button();
-            this.button13 = new System.Windows.Forms.Button();
+            this.btnRecClose = new System.Windows.Forms.Button();
+            this.btnRec = new System.Windows.Forms.Button();
+            this.hclabSendBgWork = new System.ComponentModel.BackgroundWorker();
+            this.hclabReceiveBgWork = new System.ComponentModel.BackgroundWorker();
+            this.hclabSendBgWorkNew = new System.ComponentModel.BackgroundWorker();
+            this.hclabReceiveBgWorkNew = new System.ComponentModel.BackgroundWorker();
+            this.btnCloseSend = new System.Windows.Forms.Button();
+            this.btnCloseRec = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -78,6 +86,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnCloseSend);
+            this.tabPage1.Controls.Add(this.btnSendNew);
             this.tabPage1.Controls.Add(this.label23);
             this.tabPage1.Controls.Add(this.HCLABSendErrorMsg);
             this.tabPage1.Controls.Add(this.HCLABSendMsg);
@@ -90,8 +100,8 @@
             this.tabPage1.Controls.Add(this.hclabSendLastStartTime);
             this.tabPage1.Controls.Add(this.hclabSendStatus);
             this.tabPage1.Controls.Add(this.label14);
-            this.tabPage1.Controls.Add(this.button10);
-            this.tabPage1.Controls.Add(this.button11);
+            this.tabPage1.Controls.Add(this.btnSendClose);
+            this.tabPage1.Controls.Add(this.btnSend);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -100,29 +110,16 @@
             this.tabPage1.Text = "HCLAB(傳送)";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // btnSendNew
             // 
-            this.tabPage2.Controls.Add(this.HCLABReceiveErrorMsg);
-            this.tabPage2.Controls.Add(this.HCLABReceiveMsg);
-            this.tabPage2.Controls.Add(this.label12);
-            this.tabPage2.Controls.Add(this.label13);
-            this.tabPage2.Controls.Add(this.label27);
-            this.tabPage2.Controls.Add(this.label28);
-            this.tabPage2.Controls.Add(this.label29);
-            this.tabPage2.Controls.Add(this.label30);
-            this.tabPage2.Controls.Add(this.label31);
-            this.tabPage2.Controls.Add(this.hclabReceiveLastStartTime);
-            this.tabPage2.Controls.Add(this.hclabReceiveStatus);
-            this.tabPage2.Controls.Add(this.label34);
-            this.tabPage2.Controls.Add(this.button12);
-            this.tabPage2.Controls.Add(this.button13);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(698, 494);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "HCLAB(接收)";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.btnSendNew.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnSendNew.Location = new System.Drawing.Point(351, 112);
+            this.btnSendNew.Name = "btnSendNew";
+            this.btnSendNew.Size = new System.Drawing.Size(108, 35);
+            this.btnSendNew.TabIndex = 58;
+            this.btnSendNew.Text = "新系統轉檔";
+            this.btnSendNew.UseVisualStyleBackColor = true;
+            this.btnSendNew.Click += new System.EventHandler(this.btnSendNew_Click);
             // 
             // label23
             // 
@@ -245,26 +242,65 @@
             this.label14.TabIndex = 46;
             this.label14.Text = "狀態:";
             // 
-            // button10
+            // btnSendClose
             // 
-            this.button10.Font = new System.Drawing.Font("新細明體", 12F);
-            this.button10.Location = new System.Drawing.Point(469, 112);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(87, 35);
-            this.button10.TabIndex = 45;
-            this.button10.Text = "停止轉檔";
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Visible = false;
+            this.btnSendClose.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnSendClose.Location = new System.Drawing.Point(465, 112);
+            this.btnSendClose.Name = "btnSendClose";
+            this.btnSendClose.Size = new System.Drawing.Size(87, 35);
+            this.btnSendClose.TabIndex = 45;
+            this.btnSendClose.Text = "停止轉檔";
+            this.btnSendClose.UseVisualStyleBackColor = true;
+            this.btnSendClose.Visible = false;
+            this.btnSendClose.Click += new System.EventHandler(this.btnSendClose_Click);
             // 
-            // button11
+            // btnSend
             // 
-            this.button11.Font = new System.Drawing.Font("新細明體", 12F);
-            this.button11.Location = new System.Drawing.Point(558, 112);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(87, 35);
-            this.button11.TabIndex = 44;
-            this.button11.Text = "開始轉檔";
-            this.button11.UseVisualStyleBackColor = true;
+            this.btnSend.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnSend.Location = new System.Drawing.Point(558, 112);
+            this.btnSend.Name = "btnSend";
+            this.btnSend.Size = new System.Drawing.Size(87, 35);
+            this.btnSend.TabIndex = 44;
+            this.btnSend.Text = "開始轉檔";
+            this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.btnCloseRec);
+            this.tabPage2.Controls.Add(this.btnRecNew);
+            this.tabPage2.Controls.Add(this.HCLABReceiveErrorMsg);
+            this.tabPage2.Controls.Add(this.HCLABReceiveMsg);
+            this.tabPage2.Controls.Add(this.label12);
+            this.tabPage2.Controls.Add(this.label13);
+            this.tabPage2.Controls.Add(this.label27);
+            this.tabPage2.Controls.Add(this.label28);
+            this.tabPage2.Controls.Add(this.label29);
+            this.tabPage2.Controls.Add(this.label30);
+            this.tabPage2.Controls.Add(this.label31);
+            this.tabPage2.Controls.Add(this.hclabReceiveLastStartTime);
+            this.tabPage2.Controls.Add(this.hclabReceiveStatus);
+            this.tabPage2.Controls.Add(this.label34);
+            this.tabPage2.Controls.Add(this.btnRecClose);
+            this.tabPage2.Controls.Add(this.btnRec);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(698, 494);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "HCLAB(接收)";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnRecNew
+            // 
+            this.btnRecNew.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnRecNew.Location = new System.Drawing.Point(351, 112);
+            this.btnRecNew.Name = "btnRecNew";
+            this.btnRecNew.Size = new System.Drawing.Size(108, 35);
+            this.btnRecNew.TabIndex = 56;
+            this.btnRecNew.Text = "新系統轉檔";
+            this.btnRecNew.UseVisualStyleBackColor = true;
+            this.btnRecNew.Click += new System.EventHandler(this.btnRecNew_Click);
             // 
             // HCLABReceiveErrorMsg
             // 
@@ -387,26 +423,74 @@
             this.label34.TabIndex = 44;
             this.label34.Text = "狀態:";
             // 
-            // button12
+            // btnRecClose
             // 
-            this.button12.Font = new System.Drawing.Font("新細明體", 12F);
-            this.button12.Location = new System.Drawing.Point(469, 112);
-            this.button12.Name = "button12";
-            this.button12.Size = new System.Drawing.Size(87, 35);
-            this.button12.TabIndex = 43;
-            this.button12.Text = "停止轉檔";
-            this.button12.UseVisualStyleBackColor = true;
-            this.button12.Visible = false;
+            this.btnRecClose.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnRecClose.Location = new System.Drawing.Point(465, 112);
+            this.btnRecClose.Name = "btnRecClose";
+            this.btnRecClose.Size = new System.Drawing.Size(87, 35);
+            this.btnRecClose.TabIndex = 43;
+            this.btnRecClose.Text = "停止轉檔";
+            this.btnRecClose.UseVisualStyleBackColor = true;
+            this.btnRecClose.Visible = false;
+            this.btnRecClose.Click += new System.EventHandler(this.btnRecClose_Click);
             // 
-            // button13
+            // btnRec
             // 
-            this.button13.Font = new System.Drawing.Font("新細明體", 12F);
-            this.button13.Location = new System.Drawing.Point(558, 112);
-            this.button13.Name = "button13";
-            this.button13.Size = new System.Drawing.Size(87, 35);
-            this.button13.TabIndex = 42;
-            this.button13.Text = "開始轉檔";
-            this.button13.UseVisualStyleBackColor = true;
+            this.btnRec.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnRec.Location = new System.Drawing.Point(558, 112);
+            this.btnRec.Name = "btnRec";
+            this.btnRec.Size = new System.Drawing.Size(87, 35);
+            this.btnRec.TabIndex = 42;
+            this.btnRec.Text = "開始轉檔";
+            this.btnRec.UseVisualStyleBackColor = true;
+            this.btnRec.Click += new System.EventHandler(this.btnRec_Click);
+            // 
+            // hclabSendBgWork
+            // 
+            this.hclabSendBgWork.WorkerSupportsCancellation = true;
+            this.hclabSendBgWork.DoWork += new System.ComponentModel.DoWorkEventHandler(this.hclabSendBgWork_DoWork);
+            // 
+            // hclabReceiveBgWork
+            // 
+            this.hclabReceiveBgWork.WorkerSupportsCancellation = true;
+            this.hclabReceiveBgWork.DoWork += new System.ComponentModel.DoWorkEventHandler(this.hclabReceiveBgWork_DoWork);
+            // 
+            // hclabSendBgWorkNew
+            // 
+            this.hclabSendBgWorkNew.WorkerReportsProgress = true;
+            this.hclabSendBgWorkNew.WorkerSupportsCancellation = true;
+            this.hclabSendBgWorkNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.hclabSendBgWorkNew_DoWork);
+            this.hclabSendBgWorkNew.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.hclabSendBgWorkNew_ProgressChanged);
+            // 
+            // hclabReceiveBgWorkNew
+            // 
+            this.hclabReceiveBgWorkNew.WorkerReportsProgress = true;
+            this.hclabReceiveBgWorkNew.WorkerSupportsCancellation = true;
+            this.hclabReceiveBgWorkNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.hclabReceiveBgWorkNew_DoWork);
+            this.hclabReceiveBgWorkNew.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.hclabReceiveBgWorkNew_ProgressChanged);
+            // 
+            // btnCloseSend
+            // 
+            this.btnCloseSend.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnCloseSend.Location = new System.Drawing.Point(558, 71);
+            this.btnCloseSend.Name = "btnCloseSend";
+            this.btnCloseSend.Size = new System.Drawing.Size(87, 35);
+            this.btnCloseSend.TabIndex = 70;
+            this.btnCloseSend.Text = "關閉程式";
+            this.btnCloseSend.UseVisualStyleBackColor = true;
+            this.btnCloseSend.Click += new System.EventHandler(this.btnCloseSend_Click);
+            // 
+            // btnCloseRec
+            // 
+            this.btnCloseRec.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnCloseRec.Location = new System.Drawing.Point(558, 71);
+            this.btnCloseRec.Name = "btnCloseRec";
+            this.btnCloseRec.Size = new System.Drawing.Size(87, 35);
+            this.btnCloseRec.TabIndex = 71;
+            this.btnCloseRec.Text = "關閉程式";
+            this.btnCloseRec.UseVisualStyleBackColor = true;
+            this.btnCloseRec.Click += new System.EventHandler(this.btnCloseRec_Click);
             // 
             // MachiHCLAB
             // 
@@ -416,6 +500,7 @@
             this.Controls.Add(this.tabControl1);
             this.Name = "MachiHCLAB";
             this.Text = "Lab-HCLAB儀器";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MachiHCLAB_FormClosed);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -442,8 +527,8 @@
         private System.Windows.Forms.Label hclabSendLastStartTime;
         private System.Windows.Forms.Label hclabSendStatus;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.Button btnSendClose;
+        private System.Windows.Forms.Button btnSend;
         private System.Windows.Forms.RichTextBox HCLABReceiveErrorMsg;
         private System.Windows.Forms.RichTextBox HCLABReceiveMsg;
         private System.Windows.Forms.Label label12;
@@ -456,8 +541,16 @@
         private System.Windows.Forms.Label hclabReceiveLastStartTime;
         private System.Windows.Forms.Label hclabReceiveStatus;
         private System.Windows.Forms.Label label34;
-        private System.Windows.Forms.Button button12;
-        private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.Button btnRecClose;
+        private System.Windows.Forms.Button btnRec;
+        private System.ComponentModel.BackgroundWorker hclabSendBgWork;
+        private System.ComponentModel.BackgroundWorker hclabReceiveBgWork;
+        private System.Windows.Forms.Button btnSendNew;
+        private System.Windows.Forms.Button btnRecNew;
+        private System.ComponentModel.BackgroundWorker hclabSendBgWorkNew;
+        private System.ComponentModel.BackgroundWorker hclabReceiveBgWorkNew;
+        private System.Windows.Forms.Button btnCloseSend;
+        private System.Windows.Forms.Button btnCloseRec;
     }
 }
 
