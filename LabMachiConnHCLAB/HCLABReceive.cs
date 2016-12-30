@@ -237,6 +237,7 @@ namespace LabMachiConnHCLAB
                                 //數值
                                 string chRepValue = data[5].ToString();
 
+
                                 dynamic dymSaveData = new JObject();
                                 dymSaveData.Add("tubeNo", orderID);
                                 dymSaveData.Add("seqNo", "1"); //非對應預設帶1
@@ -257,8 +258,9 @@ namespace LabMachiConnHCLAB
                                 string jTransFinish = JsonConvert.SerializeObject(dymTransFinish);
 
                                 //回傳完成訊息至HIS系統
-                                oLabComm.PostTxResult(jTransFinish);
+                                //oLabComm.PostTxResult(jTransFinish);
 
+                                oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, string.Format("檢體號:{0}儀器碼:{1}數值:{2} 傳送完畢。", orderID, chMachineMapping, chRepValue));
                             }
                         }
 

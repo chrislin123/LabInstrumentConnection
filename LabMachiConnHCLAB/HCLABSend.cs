@@ -298,7 +298,7 @@ namespace LabMachiConnHCLAB
                                 string sMachineCode = dynItem.machineCode;
                                 if (sMachineCode == "P" ||sMachineCode == "X" ||sMachineCode == "G" ||sMachineCode == "U")
                                 {
-                                    listTemp.Add(dynItem.machineCode);
+                                    listTemp.Add(Convert.ToString(dynItem.tubeNo));
                                 }
                             }
 
@@ -321,11 +321,11 @@ namespace LabMachiConnHCLAB
                                 string kind = "";
                                 //地點
                                 string location = "";
-                                //病患姓名
-                                string chname = "";
-                                //生日
-                                string chbirthday = "";
-                                //是否急件
+                                //病患姓名-api未傳
+                                string chname = "測試病患";
+                                //生日-api未傳
+                                string chbirthday = "20041025";
+                                //是否急件-api未傳
                                 string sEmg = "";
                                 //檢體儀器項目
                                 string order = getLabItemStringNew(tubeno, ary2);
@@ -338,17 +338,18 @@ namespace LabMachiConnHCLAB
                                         //病歷號
                                         chMrno = item.resumeNo;                                        
                                         //性別轉換
-                                        sex = sexConvert(item.gender);                                       
+                                        sex = sexConvert(Convert.ToString(item.gender));                                       
                                         //開單醫師
                                         dr = item.docName;
                                         //單別
-                                        kind = get_apply_kind(item.dept);
+                                        kind = get_apply_kind(Convert.ToString(item.dept));
                                         //地點
                                         location = item.roomNo;
                                         break;
                                     }
                                 }
 
+                                //return;
 
                                 
                                 //與儀器溝通
@@ -439,13 +440,28 @@ namespace LabMachiConnHCLAB
                                 oLabComm.FeedbackMsg(bw, msgtype.msgGeneral, string.Format("開單號:{0} 標籤號:{1} 傳送成功。", chTubeNo, chTubeNo));
 
                                 //將標籤號註記已上傳
-                                SQL.ExecuteSQL("update opd.tubemapping set chistransmit = 'Y', chtransmittime = '" + samplecollectiondt + "' where chtubeno = '" + chTubeNo + "'");
+                                //SQL.ExecuteSQL("update opd.tubemapping set chistransmit = 'Y', chtransmittime = '" + samplecollectiondt + "' where chtubeno = '" + chTubeNo + "'");
 
+                                //1051229 將標籤號註記已上傳(依照每一筆資料)
+                                foreach (dynamic item in ary2)
+                                {
+                                    if (item.tubeNo != tubeno) continue;
+
+                                    dynamic dymTransFinish = new JObject();
+                                    dymTransFinish.Add("tubeNo", chTubeNo);
+                                    dymTransFinish.Add("seqNo", "1"); //非對應預設帶1
+                                    dymTransFinish.Add("macPscCode", item.macPscCode);
+                                    dymTransFinish.Add("txTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+                                    string jTransFinish = JsonConvert.SerializeObject(dymTransFinish);
+
+                                    //回傳完成訊息至HIS系統
+                                    //oLabComm.PostTxResult(jTransFinish);
+                                }
 
                             }
-                        }
 
-                        
+                        }
 
                     }
                     catch (Exception ex)

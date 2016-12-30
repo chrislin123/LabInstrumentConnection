@@ -214,7 +214,6 @@
             this.btnTest.TabIndex = 83;
             this.btnTest.Text = "測試";
             this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // label1
@@ -317,6 +316,7 @@
             // 
             // bwAdviaNew
             // 
+            this.bwAdviaNew.WorkerReportsProgress = true;
             this.bwAdviaNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwAdviaNew_DoWork);
             this.bwAdviaNew.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwAdviaNew_ProgressChanged);
             this.bwAdviaNew.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwAdviaNew_RunWorkerCompleted);

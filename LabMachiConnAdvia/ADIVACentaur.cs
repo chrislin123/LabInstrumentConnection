@@ -124,12 +124,12 @@ namespace LabMachiConnAdvia
             closeSymbol = false;
 
             //Centaur IP
-            string host = SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurIP'");
-            //host = "123.123.123.123";            
+            //string host = SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurIP'");
+            string host = "192.168.12.29";            
 
             //AVDIA ORDER Port
-            int port = int.Parse(SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurPort'"));
-            //int port = 8081;         
+            //int port = int.Parse(SQL.Get_Scalar("select chparamtext from basedata.systemctrl where chparamcode = 'ADVIACentaurPort'"));
+            int port = 1024;         
 
             //SOH[01]=Beginning of Header
             //STX[02]=Beginning of Text Sending
@@ -827,6 +827,8 @@ namespace LabMachiConnAdvia
 
                 foreach (string sLisCode in oAdivaData.OrderList)
                 {
+                    oMachData.chMachineMapping = sLisCode;
+
                     //寫入His系統的數值
                     string sValue = string.Empty;
                     //目前儀器傳出來的項目數值
@@ -853,9 +855,10 @@ namespace LabMachiConnAdvia
                         oMachData.chMachineNo = dr["chMachineNo"].ToString();
                         oMachData.chTransmitTime = TransmitTime;
                         oMachData.chMachineMapping = sLisCode;
-                    }
+                    }                    
+                    */
 
-                    //寫入記錄檔
+                    //調整非線性數值資料                    
                     foreach (AdivaRecordData item in oAdivaData.RecordList)
                     {
                         if (item.LIScode != sLisCode) continue;
@@ -881,30 +884,8 @@ namespace LabMachiConnAdvia
                         oMachData.chValuetype = item.ResultAspects;
                         oMachData.chUnit = item.DataUnits;
 
-                        ssql = " insert into opd.labmachinedata "
-                             + " (chLabEmrNo,intSeq,chTubeNo,chCombineCode "
-                             + " ,chMachineNo,chMachineMapping,chValuetype,chValue "
-                             + " ,chUnit,chTransmitTime,chOnBoardTime,chUpdToHisTime) "
-                             + " values ( "
-                             + " '" + oMachData.chLabEmrNo + "' "
-                             + " ,'" + oMachData.intSeq + "' "
-                            //+ " ,'" + oMachData.chTubeNo + "' "
-                             + " ,'" + oAdivaData.SampleID + "' "  //選擇儀器sampleno(管號或試管號)                                 
-                             + " ,'" + oMachData.chCombineCode + "' "
-                             + " ,'" + oMachData.chMachineNo + "' "
-                             + " ,'" + oMachData.chMachineMapping + "' "
-                             + " ,'" + oMachData.chValuetype + "' "
-                             + " ,'" + oMachData.chValue + "' "
-                             + " ,'" + oMachData.chUnit + "' "
-                             + " ,'" + oMachData.chTransmitTime + "' "
-                             + " ,'" + oMachData.chOnBoardTime + "' "
-                             + " ,'' "
-                             + " ) "
-                             ;
-                        SQL.ExecuteSQL(ssql);
+                        
                     }
-                    */
-                    //調整非線性數值資料
 
 
                     //取得數值組合設定檔                    
@@ -915,7 +896,15 @@ namespace LabMachiConnAdvia
                     //string ValueType = SQL.Get_Scalar(ssql);
 
                     //1051221 配合新系統改寫，設定檔寫死在程式碼中
-                    string ValueType = dicList[oMachData.chMachineMapping].ToString();
+                    string ValueType = "";
+                    try
+                    {
+                        ValueType = dicList[oMachData.chMachineMapping].ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        ValueType = "";
+                    }
 
 
                     if (ValueType == "Tp1") //DOSE
@@ -949,6 +938,8 @@ namespace LabMachiConnAdvia
                     }
 
 
+                    
+
                     //1051221 
 
                     //檢體號
@@ -956,6 +947,10 @@ namespace LabMachiConnAdvia
 
                     //儀器數值代碼                    
                     string chMachineMapping = oMachData.chMachineMapping;
+
+                    //測試資料
+                    //sValue = "33133.56";
+                    //chMachineMapping = "HBs";
 
                     //數值
                     string chRepValue = sValue;
@@ -1553,7 +1548,7 @@ namespace LabMachiConnAdvia
 
         public string test(System.Windows.Forms.Label ADVIAStatus)
         {
-            string kind = SQL.Get_Scalar("select log from opd.labinstrumentlog where autoinc = '3810'");
+            string kind = SQL.Get_Scalar("select log from opd.labinstrumentlog where autoinc = '6149'");
             //string kind1 = SQL.Get_Scalar("select log from opd.labinstrumentlog where autoinc = '4736'");        
 
             AdivaData oAdivaData = DataConvertToAdivaData(kind);
@@ -1561,7 +1556,9 @@ namespace LabMachiConnAdvia
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true;
-            MachineDataToHis(oAdivaData, bw);
+            //MachineDataToHis(oAdivaData, bw);
+            //MachineDataToHisNew(oAdivaData)
+            MachineDataToHisNew(oAdivaData, bw);
             
             return "";
         }
@@ -1589,8 +1586,7 @@ namespace LabMachiConnAdvia
             dicList.Add("CA153", "Tp1");
             dicList.Add("iPTH", "Tp1");
             dicList.Add("THCG", "Tp1");
-            dicList.Add("COR", "Tp1");
-            dicList.Add("PCT", "Tp1");
+            dicList.Add("COR", "Tp1");            
 
             dicList.Add("aHBs2", "Tp2");
             dicList.Add("RubG", "Tp2");
