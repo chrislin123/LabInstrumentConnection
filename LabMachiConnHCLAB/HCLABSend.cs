@@ -338,17 +338,24 @@ namespace LabMachiConnHCLAB
                                         //病歷號
                                         chMrno = item.resumeNo;                                        
                                         //性別轉換
-                                        sex = sexConvert(Convert.ToString(item.gender));                                       
+                                        sex = sexConvertNew(Convert.ToString(item.gender));                                       
                                         //開單醫師
                                         dr = item.docName;
                                         //單別
                                         kind = get_apply_kind(Convert.ToString(item.dept));
                                         //地點
                                         location = item.roomNo;
+                                        //病患姓名
+                                        chname = item.ptName;
+                                        //生日
+                                        chbirthday = item.dob;
+                                        //是否急件
+                                        sEmg = convertOrderStatusNew(Convert.ToString(item.isErgent));
                                         break;
                                     }
                                 }
 
+                                //continue;
                                 //return;
 
                                 
@@ -493,6 +500,19 @@ namespace LabMachiConnHCLAB
         {
             if (chemg == "Y") { return "S"; }
             return "S";
+        }
+
+        /// <summary>
+        /// 是否急件標示轉換
+        /// </summary>
+        /// <param name="chemg"></param>
+        /// <returns></returns>
+        private string convertOrderStatusNew(string chemg)
+        {
+            string sResult = "";
+            if (chemg == "Y") sResult = "S";
+
+            return sResult;
         }
 
         /// <summary>
@@ -687,6 +707,23 @@ namespace LabMachiConnHCLAB
             }
             return result;
         }
+
+        /// <summary>
+        /// 性別轉換。0:性別未知 1:男性 2:女性。
+        /// </summary>
+        /// <param name="sex"></param>
+        /// <returns></returns>
+        public string sexConvertNew(string sex)
+        {
+            string result = "U";
+
+            //1060105 性別。0:性別未知 1:男性 2:女性。
+            if (sex == "1") result = "F";
+            if (sex == "2") result = "M";            
+           
+            return result;
+        }
+
         /// <summary>
         /// Hex = > ASCII 轉碼
         /// </summary>
