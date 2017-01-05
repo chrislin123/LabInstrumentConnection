@@ -321,11 +321,11 @@ namespace LabMachiConnHCLAB
                                 string kind = "";
                                 //地點
                                 string location = "";
-                                //病患姓名-api未傳
-                                string chname = "測試病患";
-                                //生日-api未傳
-                                string chbirthday = "20041025";
-                                //是否急件-api未傳
+                                //病患姓名
+                                string chname = "";
+                                //生日
+                                string chbirthday = "";
+                                //是否急件
                                 string sEmg = "";
                                 //檢體儀器項目
                                 string order = getLabItemStringNew(tubeno, ary2);
