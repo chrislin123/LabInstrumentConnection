@@ -30,6 +30,7 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnCloseSend = new System.Windows.Forms.Button();
             this.btnSendNew = new System.Windows.Forms.Button();
             this.label23 = new System.Windows.Forms.Label();
             this.HCLABSendErrorMsg = new System.Windows.Forms.RichTextBox();
@@ -46,6 +47,7 @@
             this.btnSendClose = new System.Windows.Forms.Button();
             this.btnSend = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnCloseRec = new System.Windows.Forms.Button();
             this.btnRecNew = new System.Windows.Forms.Button();
             this.HCLABReceiveErrorMsg = new System.Windows.Forms.RichTextBox();
             this.HCLABReceiveMsg = new System.Windows.Forms.RichTextBox();
@@ -65,8 +67,6 @@
             this.hclabReceiveBgWork = new System.ComponentModel.BackgroundWorker();
             this.hclabSendBgWorkNew = new System.ComponentModel.BackgroundWorker();
             this.hclabReceiveBgWorkNew = new System.ComponentModel.BackgroundWorker();
-            this.btnCloseSend = new System.Windows.Forms.Button();
-            this.btnCloseRec = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -109,6 +109,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "HCLAB(傳送)";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // btnCloseSend
+            // 
+            this.btnCloseSend.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnCloseSend.Location = new System.Drawing.Point(558, 71);
+            this.btnCloseSend.Name = "btnCloseSend";
+            this.btnCloseSend.Size = new System.Drawing.Size(87, 35);
+            this.btnCloseSend.TabIndex = 70;
+            this.btnCloseSend.Text = "關閉程式";
+            this.btnCloseSend.UseVisualStyleBackColor = true;
+            this.btnCloseSend.Click += new System.EventHandler(this.btnCloseSend_Click);
             // 
             // btnSendNew
             // 
@@ -263,6 +274,7 @@
             this.btnSend.TabIndex = 44;
             this.btnSend.Text = "開始轉檔";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Visible = false;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
             // tabPage2
@@ -290,6 +302,17 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "HCLAB(接收)";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnCloseRec
+            // 
+            this.btnCloseRec.Font = new System.Drawing.Font("新細明體", 12F);
+            this.btnCloseRec.Location = new System.Drawing.Point(558, 71);
+            this.btnCloseRec.Name = "btnCloseRec";
+            this.btnCloseRec.Size = new System.Drawing.Size(87, 35);
+            this.btnCloseRec.TabIndex = 71;
+            this.btnCloseRec.Text = "關閉程式";
+            this.btnCloseRec.UseVisualStyleBackColor = true;
+            this.btnCloseRec.Click += new System.EventHandler(this.btnCloseRec_Click);
             // 
             // btnRecNew
             // 
@@ -469,28 +492,6 @@
             this.hclabReceiveBgWorkNew.WorkerSupportsCancellation = true;
             this.hclabReceiveBgWorkNew.DoWork += new System.ComponentModel.DoWorkEventHandler(this.hclabReceiveBgWorkNew_DoWork);
             this.hclabReceiveBgWorkNew.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.hclabReceiveBgWorkNew_ProgressChanged);
-            // 
-            // btnCloseSend
-            // 
-            this.btnCloseSend.Font = new System.Drawing.Font("新細明體", 12F);
-            this.btnCloseSend.Location = new System.Drawing.Point(558, 71);
-            this.btnCloseSend.Name = "btnCloseSend";
-            this.btnCloseSend.Size = new System.Drawing.Size(87, 35);
-            this.btnCloseSend.TabIndex = 70;
-            this.btnCloseSend.Text = "關閉程式";
-            this.btnCloseSend.UseVisualStyleBackColor = true;
-            this.btnCloseSend.Click += new System.EventHandler(this.btnCloseSend_Click);
-            // 
-            // btnCloseRec
-            // 
-            this.btnCloseRec.Font = new System.Drawing.Font("新細明體", 12F);
-            this.btnCloseRec.Location = new System.Drawing.Point(558, 71);
-            this.btnCloseRec.Name = "btnCloseRec";
-            this.btnCloseRec.Size = new System.Drawing.Size(87, 35);
-            this.btnCloseRec.TabIndex = 71;
-            this.btnCloseRec.Text = "關閉程式";
-            this.btnCloseRec.UseVisualStyleBackColor = true;
-            this.btnCloseRec.Click += new System.EventHandler(this.btnCloseRec_Click);
             // 
             // MachiHCLAB
             // 
